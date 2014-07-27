@@ -13,5 +13,11 @@
     "hapi": "~6.2.1",
     "knex": "~0.6.22",
     "pg": "~3.4.0"
+  },
+  "devDependencies": {
+    "gulp-jshint": "~1.8.0",
+    "gulp": "~3.8.6",
+    "gulp-nodemon": "~1.0.4",
+    "gulp-ignore": "~1.2.0"
   }
 }
