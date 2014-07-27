@@ -1,0 +1,17 @@
+{
+  "name": "user_api",
+  "version": "0.0.0",
+  "description": "User API for Lob's coding challenge",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Matthew Nguyen <mnguyen916@gmail.com>",
+  "license": "ISC",
+  "dependencies": {
+    "bookshelf": "~0.7.7",
+    "hapi": "~6.2.1",
+    "knex": "~0.6.22",
+    "pg": "~3.4.0"
+  }
+}
