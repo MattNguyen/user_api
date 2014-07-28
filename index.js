@@ -63,8 +63,15 @@ server.route([{
 }, {
   path: '/api/{version}/users/{id}',
   method: 'DELETE',
-  handler: function() {
-
+  handler: function(request, reply) {
+    User.forge({id: request.params.id})
+    .destroy()
+    .then(function() {
+      reply('success');
+    })
+    .catch(function(err) {
+      reply(err);
+    });
   }
 }]);
 
