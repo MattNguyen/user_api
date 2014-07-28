@@ -11,7 +11,9 @@ gulp.task('lint', function() {
 gulp.task('dev', function() {
   nodemon({
     script: './index.js',
-    ignore: ['gulpfile.js', 'node_modules']
+    ignore: ['gulpfile.js', 'node_modules'],
+    env: { 'NODE_ENV': 'development' },
+    nodeArgs: ['--debug']
   })
   .on('change', ['lint']);
 });
