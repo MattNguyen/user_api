@@ -4,6 +4,8 @@ var BaseModel = require('./base');
 var uuid = require('node-uuid');
 var Joi = require('joi');
 var crypto = require('crypto');
+var jwt = require('jsonwebtoken');
+var secretKey = require('../config/secret_key');
 
 var userSchema = Joi.object().keys({
   email: Joi.string().email().required(),
@@ -27,6 +29,7 @@ module.exports = BaseModel.extend({
 
   initialize: function() {
     this.on('saving', this.validate);
+    this.on('saved', this.setSessionToken);
   },
 
   validate: function() {
@@ -35,5 +38,13 @@ module.exports = BaseModel.extend({
         throw new UserValidationError(err.message);
       }
     });
+  },
+
+  setSessionToken: function() {
+    if (this.get('id') && this.get('sessionKey')) {
+      this.set('sessionToken', jwt.sign(this.pick('id', 'sessionKey'), secretKey));
+    }
+
+    return this;
   }
 });

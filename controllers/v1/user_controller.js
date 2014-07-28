@@ -3,8 +3,8 @@
 var User = require('../../models/user');
 var _ = require('lodash');
 _.str = require('underscore.string');
-var jwt = require('jsonwebtoken');
-var secretKey = require('../../config/secret_key');
+var Redis = require('redis');
+var RedisClient = Redis.createClient();
 
 var UserController = {
 
@@ -19,7 +19,9 @@ var UserController = {
     User.forge(userProfile)
     .save()
     .then(function(user) {
-      user.set('sessionToken', jwt.sign(user.pick('id', 'sessionKey'), secretKey));
+      // Cache user data keyed off of ID
+      RedisClient.hmset(user.get('id'), user.attributes);
+
       reply(user.pick('sessionToken', 'firstName', 'lastName', 'email', 'id'));
     })
     .catch(function(err) {
@@ -29,14 +31,7 @@ var UserController = {
 
   // GET /api/{version}/users/{id}
   show: function(request, reply) {
-    User.forge({id: request.params.id})
-    .fetch({require: true})
-    .then(function(user) {
-      reply(user.pick('firstName', 'lastName', 'email', 'id'));
-    })
-    .catch(function(error) {
-      reply(error);
-    });
+    return reply(_.pick(request.auth.credentials, ['firstName', 'lastName', 'email', 'id', 'sessionToken']));
   },
 
   // PUT /api/{version}/users/{id}
@@ -56,7 +51,11 @@ var UserController = {
       return user.save();
     })
     .then(function(user) {
-      reply(user.pick('id', 'firstName', 'lastName', 'email'));
+      RedisClient.hmset(user.get('id'), user.attributes);
+      return user;
+    })
+    .then(function(user) {
+      reply(user.pick('id', 'firstName', 'lastName', 'email', 'sessionToken'));
     });
   },
 
@@ -64,6 +63,9 @@ var UserController = {
   destroy: function(request, reply) {
     User.forge({id: request.params.id})
     .destroy()
+    .then(function() {
+      RedisClient.del(request.params.id);
+    })
     .then(function() {
       reply('success');
     })

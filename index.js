@@ -4,7 +4,8 @@ var Hapi = require('hapi');
 var server = new Hapi.Server(process.env.PORT, process.env.HOST);
 var _ = require('lodash');
 var secretKey = require('./config/secret_key');
-var User = require('./models/user');
+var Redis = require('redis');
+var RedisClient = Redis.createClient();
 
 var VERSIONS = ['v1'];
 
@@ -13,13 +14,12 @@ var validateToken = function(token, decodedToken, callback) {
   console.log('token:', token);
   console.log('decoded:', decodedToken);
 
-  User.forge({id: decodedToken.id})
-  .fetch({require: true})
-  .then(function(user) {
-    return callback(null, true, user);
-  })
-  .catch(function() {
-    return callback(null, false);
+  RedisClient.hgetall(decodedToken.id, function(err, user) {
+    if (user) {
+      return callback(null, true, user);
+    } else {
+      return callback(null, false);
+    }
   });
 };
 
