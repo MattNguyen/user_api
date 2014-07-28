@@ -23,6 +23,25 @@ var validateToken = function(token, decodedToken, callback) {
   });
 };
 
+var rateLimiter = function(rateLimit, rateLimitKey, request, reply, callback) {
+    RedisClient.llen(rateLimitKey, function(err, val) {
+      if (val > rateLimit) {
+        return reply({error: 'Exceeded API request limit'}).code(429);
+      } else {
+        var multi = RedisClient.multi();
+        if (RedisClient.exists(rateLimitKey)) {
+          multi.rpush(rateLimitKey, rateLimitKey);
+          multi.expire(rateLimitKey, 60);
+          multi.exec();
+        } else {
+          RedisClient.rpushx(rateLimitKey, rateLimitKey);
+        }
+
+        callback(request, reply);
+      }
+    });
+};
+
 server.pack.register(require('hapi-auth-jsonwebtoken'), function() {
   server.auth.strategy('jwt', 'jwt', { key: secretKey,  validateFunc: validateToken });
 
@@ -32,12 +51,20 @@ server.pack.register(require('hapi-auth-jsonwebtoken'), function() {
     method: 'POST',
     config: { auth: false },
     handler: function(request, reply) {
+      // Return error if version path does not exist
       if (_.indexOf(VERSIONS, request.params.version) === -1) {
         return reply({error: 'API version not found'}).code(404);
       }
+      // Rate limit policy (requests per minute)
+      var rateLimit = 2;
 
+      // Rate limit on IP level
+      var rateLimitKey = request.info.remoteAddress + '_' + request.method + '_' + request.path;
+
+      // UserController
       var UserController = require('./controllers/' + request.params.version + '/user_controller');
-      UserController.create(request, reply);
+
+      rateLimiter(rateLimit, rateLimitKey, request, reply, UserController.create);
     }
   }, {
     path: '/api/{version}/users/{id}',

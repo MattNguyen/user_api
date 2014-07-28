@@ -23,12 +23,12 @@ module.exports = BaseModel.extend({
   tableName: 'users',
 
   defaults: {
-    id: uuid.v4(),
     sessionKey: crypto.randomBytes(16).toString('hex')
   },
 
   initialize: function() {
     this.on('saving', this.validate);
+    this.on('saving', this.generateUUID);
     this.on('saved', this.setSessionToken);
   },
 
@@ -46,5 +46,10 @@ module.exports = BaseModel.extend({
     }
 
     return this;
+  },
+
+  generateUUID: function() {
+    return this.set('id', uuid.v4());
   }
+
 });
