@@ -17,7 +17,8 @@
     "lodash": "~2.4.1",
     "node-uuid": "~1.4.1",
     "joi": "~4.6.1",
-    "bluebird": "~2.2.2"
+    "bluebird": "~2.2.2",
+    "hapi-auth-jsonwebtoken": "~0.2.1"
   },
   "devDependencies": {
     "gulp-jshint": "~1.8.0",

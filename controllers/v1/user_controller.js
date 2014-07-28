@@ -3,6 +3,8 @@
 var User = require('../../models/user');
 var _ = require('lodash');
 _.str = require('underscore.string');
+var jwt = require('jsonwebtoken');
+var secretKey = require('../../config/secret_key');
 
 var UserController = {
 
@@ -17,7 +19,8 @@ var UserController = {
     User.forge(userProfile)
     .save()
     .then(function(user) {
-      reply(user.pick('firstName', 'lastName', 'email', 'id'));
+      user.set('sessionToken', jwt.sign(user.pick('id', 'sessionKey'), secretKey));
+      reply(user.pick('sessionToken', 'firstName', 'lastName', 'email', 'id'));
     })
     .catch(function(err) {
       reply(err);
