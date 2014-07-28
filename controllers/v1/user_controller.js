@@ -22,7 +22,7 @@ var UserController = {
       // Cache user data keyed off of ID
       RedisClient.hmset(user.get('id'), user.attributes);
 
-      reply(user.pick('sessionToken', 'firstName', 'lastName', 'email', 'id'));
+      reply(user.pick('sessionToken', 'firstName', 'lastName', 'email', 'id')).code(201);
     })
     .catch(function(err) {
       reply(err);
@@ -31,7 +31,7 @@ var UserController = {
 
   // GET /api/{version}/users/{id}
   show: function(request, reply) {
-    return reply(_.pick(request.auth.credentials, ['firstName', 'lastName', 'email', 'id', 'sessionToken']));
+    return reply(_.pick(request.auth.credentials, ['firstName', 'lastName', 'email', 'id', 'sessionToken'])).code(200);
   },
 
   // PUT /api/{version}/users/{id}
@@ -55,7 +55,7 @@ var UserController = {
       return user;
     })
     .then(function(user) {
-      reply(user.pick('id', 'firstName', 'lastName', 'email', 'sessionToken'));
+      reply(user.pick('id', 'firstName', 'lastName', 'email', 'sessionToken')).code(201);
     });
   },
 
@@ -67,7 +67,7 @@ var UserController = {
       RedisClient.del(request.params.id);
     })
     .then(function() {
-      reply('success');
+      reply().code(204);
     })
     .catch(function(err) {
       reply(err);
