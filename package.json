@@ -4,7 +4,7 @@
   "description": "User API for Lob's coding challenge",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha"
   },
   "author": "Matthew Nguyen <mnguyen916@gmail.com>",
   "license": "ISC",
@@ -12,12 +12,16 @@
     "bookshelf": "~0.7.7",
     "hapi": "~6.2.1",
     "knex": "~0.6.22",
-    "pg": "~3.4.0"
+    "pg": "~3.4.0",
+    "underscore.string": "~2.3.3",
+    "lodash": "~2.4.1",
+    "node-uuid": "~1.4.1"
   },
   "devDependencies": {
     "gulp-jshint": "~1.8.0",
     "gulp": "~3.8.6",
     "gulp-nodemon": "~1.0.4",
-    "gulp-ignore": "~1.2.0"
+    "gulp-ignore": "~1.2.0",
+    "jsonwebtoken": "~0.4.1"
   }
 }

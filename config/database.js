@@ -1,4 +1,4 @@
-module.exports = databaseConfig = {
+module.exports = {
   development: {
     client: 'pg',
     connection: {

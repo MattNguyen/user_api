@@ -1,3 +1,5 @@
+'use strict';
+
 var gulp = require('gulp');
 var jshint = require('gulp-jshint');
 var nodemon = require('gulp-nodemon');
@@ -13,7 +15,7 @@ gulp.task('dev', function() {
     script: './index.js',
     ignore: ['gulpfile.js', 'node_modules'],
     env: { 'NODE_ENV': 'development' },
-    nodeArgs: ['--debug']
+    nodeArgs: ['--debug', '--harmony', '--use_strict']
   })
   .on('change', ['lint']);
 });
