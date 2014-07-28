@@ -1,7 +1,7 @@
 'use strict';
 
 var Hapi = require('hapi');
-var server = new Hapi.Server(8080, 'localhost');
+var server = new Hapi.Server(process.env.PORT, process.env.HOST);
 var _ = require('lodash');
 
 var VERSIONS = ['v1'];

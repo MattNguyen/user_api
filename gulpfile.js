@@ -14,7 +14,11 @@ gulp.task('dev', function() {
   nodemon({
     script: './index.js',
     ignore: ['gulpfile.js', 'node_modules'],
-    env: { 'NODE_ENV': 'development' },
+    env: {
+      'NODE_ENV': 'development',
+      'PORT': 8080,
+      'HOST': 'localhost'
+    },
     nodeArgs: ['--debug', '--harmony', '--use_strict']
   })
   .on('change', ['lint']);
