@@ -3,6 +3,8 @@
 var Hapi = require('hapi');
 var server = new Hapi.Server(8080, 'localhost');
 var User = require('./models/user');
+var _ = require('lodash');
+_.str = require('underscore.string');
 
 server.route([{
   path: '/api/{version}/users',
@@ -17,7 +19,7 @@ server.route([{
     User.forge(userProfile)
     .save()
     .then(function(user) {
-      reply(user);
+      reply(user.pick('firstName', 'lastName', 'email', 'id'));
     })
     .catch(function(err) {
       reply(err);
@@ -28,9 +30,9 @@ server.route([{
   method: 'GET',
   handler: function(request, reply) {
     User.forge({id: request.params.id})
-    .fetch()
+    .fetch({require: true})
     .then(function(user) {
-      reply(user);
+      reply(user.pick('firstName', 'lastName', 'email', 'id'));
     })
     .catch(function(error) {
       reply(error);
@@ -39,8 +41,24 @@ server.route([{
 }, {
   path: '/api/{version}/users/{id}',
   method: 'PUT',
-  handler: function() {
+  handler: function(request, reply) {
+    User.forge({id: request.params.id})
+    .fetch({require: true})
+    .then(function(user) {
+      var updatedUser = _.pick(request.payload, ['first_name', 'last_name', 'email']);
 
+      _.forIn(updatedUser, function(value, attr) {
+        user.set(_.str.camelize(attr), value);
+      });
+
+      return user;
+    })
+    .then(function(user) {
+      return user.save();
+    })
+    .then(function(user) {
+      reply(user.pick('id', 'firstName', 'lastName', 'email'));
+    });
   }
 }, {
   path: '/api/{version}/users/{id}',
