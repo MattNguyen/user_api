@@ -25,7 +25,7 @@ var validateToken = function(token, decodedToken, callback) {
 
 var rateLimiter = function(rateLimit, rateLimitKey, request, reply, callback) {
     RedisClient.llen(rateLimitKey, function(err, val) {
-      if (val > rateLimit) {
+      if (val > rateLimit - 1) {
         return reply({error: 'Exceeded API request limit'}).code(429);
       } else {
         var multi = RedisClient.multi();
@@ -71,24 +71,40 @@ server.pack.register(require('hapi-auth-jsonwebtoken'), function() {
     method: 'GET',
     config: { auth: 'jwt' },
     handler: function(request, reply) {
+      // Return error if version path does not exist
       if (_.indexOf(VERSIONS, request.params.version) === -1) {
         return reply({error: 'API version not found'}).code(404);
       }
 
+      // Rate limit policy (requests per minute)
+      var rateLimit = 10;
+
+      // Rate limit on sessionToken
+      var rateLimitKey = request.auth.credentials.sessionToken + '_' + request.method + '_' + request.path;
+
+      // UserController
       var UserController = require('./controllers/' + request.params.version + '/user_controller');
-      UserController.show(request, reply);
+      rateLimiter(rateLimit, rateLimitKey, request, reply, UserController.show);
     }
   }, {
     path: '/api/{version}/users/{id}',
     method: 'PUT',
     config: { auth: 'jwt' },
     handler: function(request, reply) {
+      // Return error if version path does not exist
       if (_.indexOf(VERSIONS, request.params.version) === -1) {
         return reply({error: 'API version not found'}).code(404);
       }
 
+      // Rate limit policy (requests per minute)
+      var rateLimit = 10;
+
+      // Rate limit on sessionToken
+      var rateLimitKey = request.auth.credentials.sessionToken + '_' + request.method + '_' + request.path;
+
+      // UserController
       var UserController = require('./controllers/' + request.params.version + '/user_controller');
-      UserController.update(request, reply);
+      rateLimiter(rateLimit, rateLimitKey, request, reply, UserController.update);
     }
   }, {
     path: '/api/{version}/users/{id}',
