@@ -27,7 +27,15 @@ user=# CREATE DATABASE user_api_dev;
 
 ##### POST /api/v1/users
 
-Creates a user.
+Creates a new user with a sessionToken to be passed as an Authorization header with each subsequent request.
+
+For example,
+
+`Authorization: Bearer <sessionToken>`
+
+*Authentication required:* false
+
+*API Limit:* 2
 
 *Params:*
 * email (required)
@@ -45,6 +53,10 @@ Creates a user.
 
 Retrieves a user with id.
 
+*Authentication required:* false
+
+*API Limit:* 10
+
 *Params:*
 * id
 
@@ -58,6 +70,10 @@ Retrieves a user with id.
 ##### PUT /api/v1/users/{id}
 
 Updates a user at id.
+
+*Authentication required:* false
+
+*API Limit:* 10
 
 *Params:*
 * email
@@ -75,8 +91,15 @@ Updates a user at id.
 
 Deletes a user at id.
 
+*Authentication required:* false
+
+*API Limit:* None
+
 *Params:*
 * id
 
 *Response:*
 (none)
+
+### Notes
+* This API showcases simple implementations for rate limiting and authentication, though the application may be incorrect. For example, using JSON web tokens as sessionTokens here implies user level authentication. However, any request with a valid sessionKey is given access to all User reads, updates, and deletes, which implies application level authentication. User level authentication should scope all requests to the current user.
