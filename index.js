@@ -15,7 +15,7 @@ var validateToken = function(token, decodedToken, callback) {
   console.log('decoded:', decodedToken);
 
   RedisClient.hgetall(decodedToken.id, function(err, user) {
-    if (user) {
+    if (user && user.sessionToken === token) {
       return callback(null, true, user);
     } else {
       return callback(null, false);

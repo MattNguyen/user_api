@@ -11,7 +11,8 @@ var userSchema = Joi.object().keys({
   email: Joi.string().email().required(),
   firstName: Joi.string(),
   lastName: Joi.string(),
-  sessionKey: Joi.string().required()
+  sessionKey: Joi.string().required(),
+  sessionToken: Joi.string()
 });
 
 var UserValidationError = function(message) {
@@ -28,8 +29,8 @@ module.exports = BaseModel.extend({
 
   initialize: function() {
     this.on('saving', this.validate);
-    this.on('saving', this.generateUUID);
-    this.on('saved', this.setSessionToken);
+    this.on('creating', this.generateUUID);
+    this.on('creating', this.setSessionToken);
   },
 
   validate: function() {
